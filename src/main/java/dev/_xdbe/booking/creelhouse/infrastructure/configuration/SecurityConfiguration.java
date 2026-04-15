@@ -27,7 +27,7 @@ public class SecurityConfiguration {
         return http
             .authorizeHttpRequests(auth -> auth
                 // Step 4a: add access control
-                // ...
+                
                 // Step 4a: end
                 .anyRequest().permitAll()
             )
@@ -47,7 +47,19 @@ public class SecurityConfiguration {
     }
 
     // Step 3: add InMemoryUserDetailsManager
-    // ...
+    @Bean
+    public UserDetailsService userDetailsService() {
+        UserDetails administrator = User.builder()
+            .username("admin")
+            .password("{bcrypt}$2a$10$P2yncfL4XZq1HPdWmCCWJucKAjoYGPO1BMMgWq.PEeE33QBjYWfa2")
+            .roles("ADMIN");
+        UserDetails guest = User.builder()
+            .username("guest")
+            .password("{bcrypt}$2a$10$P2yncfL4XZq1HPdWmCCWJucKAjoYGPO1BMMgWq.PEeE33QBjYWfa2")
+            .roles("GUEST");
+        return new InMemoryUserDetailsManager(administrator, guest)
+    }  
+    
     // Step 3: end
 
 }
