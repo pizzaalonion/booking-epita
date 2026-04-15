@@ -31,6 +31,10 @@ server:
   # Step 1b: Enable SSL and specify ssl bundle
   ssl:
     bundle: web
+  servlet:
+    session:
+      cookie:
+        same-site: strict
   # Step 1b: End of SSL configuration
   # Step 5: Configure session cookie with SameSite attribute
   # ...
