@@ -18,7 +18,7 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
 
       - name: Run OSV Scanner
         uses: "google/osv-scanner-action/osv-scanner-action@3d5827dbebf8a3f7ba681e730a8a1b116e8ebddd" 
@@ -42,7 +42,7 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
 
       - name: Run Semgrep
         run: semgrep scan --config=.semgrep --sarif --output semgrep.sarif
