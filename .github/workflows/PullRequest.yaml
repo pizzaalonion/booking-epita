@@ -1,0 +1,78 @@
+name: security
+
+on:
+  pull_request:
+
+permissions:
+  contents: read
+  security-events: write
+  actions: read
+
+jobs:
+
+  dependencies-analysis:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout PR code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: checkout baseline commit
+        run: git checkout ${{ github.event.pull_request.base.sha }}
+
+      - name: run osv-scanner baseline
+        uses: google/osv-scanner-action/osv-scanner-action@c51854704019a247608d928f370c98740469d4b5
+        with:
+          scan-args: |
+            --format sarif
+            --output baseline.sarif
+            ./
+
+      - name: checkout PR commit
+        run: git checkout ${{ github.event.pull_request.head.sha }}
+
+      - name: run osv-scanner PR
+        uses: google/osv-scanner-action/osv-scanner-action@c51854704019a247608d928f370c98740469d4b5
+        with:
+          scan-args: |
+            --format sarif
+            --output pr.sarif
+            ./
+
+      - name: compare results
+        uses: google/osv-scanner-action/osv-reporter-action@v1
+        with:
+          base-scan: baseline.sarif
+          head-scan: pr.sarif
+          output: diff.sarif
+
+      - name: upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: osv-diff
+          path: diff.sarif
+
+
+  source-code-analysis:
+    runs-on: ubuntu-latest
+
+    container:
+      image: returntocorp/semgrep
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: run semgrep diff
+        run: |
+          git diff origin/${{ github.event.pull_request.base.ref }}...HEAD > diff.txt
+          semgrep scan --config .semgrep --sarif --output semgrep.sarif
+
+      - name: upload semgrep diff
+        uses: actions/upload-artifact@v4
+        with:
+          name: semgrep-diff
+          path: semgrep.sarif
