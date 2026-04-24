@@ -20,8 +20,3 @@ public class VulnerableController {
 		return new ResponseEntity<>(payload, HttpStatus.OK);
 	}
 }
-
-@GetMapping("/test")
-public String test(HttpServletRequest request) {
-    return request.getParameter("input"); // unsafe reflection pattern
-}
